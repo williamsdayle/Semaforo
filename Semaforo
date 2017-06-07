@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+struct semaforo{
+    pthread_t fila[50];
+};
+    int estado = 0;
+    int controlador = -1;
+
+void esperar(struct semaforo semaforo){
+    controlador++;
+    pthread_t esperando = semaforo.fila[controlador];
+    while(esperando != semaforo.fila[0]);
+    estado = 1;
+}
+
+void entrar(struct semaforo semaforo){
+    int i;
+    if(controlador > 0){
+        for(i = 0; i < controlador; i++){
+            semaforo.fila[i] = semaforo.fila[i+1];
+        }
+    }else{
+        semaforo.fila[0] = NULL;
+    }
+    controlador--;
+    estado = 0;
+}
