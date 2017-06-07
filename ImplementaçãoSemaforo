@@ -1,0 +1,39 @@
+#include "semaforo.c"
+#include <pthread.h>
+
+struct semaforo sem;
+pthread_t threads[5];
+int valores = 0;
+FILE* arq;
+void* soma(void* parametro);
+void* subtracao(void* parametro);
+
+int main(){
+  arq = fopen("textto.txt","r");
+  int i;
+  for(i = 0; i<5; i++){
+    if(i%2==0){
+      pthread_create(&threads[i],NULL,soma,NULL);
+    }else{
+      pthread_create(&threads[i],NULL,subtracao,NULL);
+    }
+  }
+  printf("%d",valores);
+  return 0;
+}
+
+void* soma(void* parametro){
+  esperar(sem);
+  int valor = valores;
+  valor = valor + fgetc(arq);
+  valores = valor - 48;
+  entrar(sem);
+}
+
+void* subtracao(void* parametro){
+  esperar(sem);
+  int valor = valores;
+  valor = valor - fgetc(arq);
+  valores = valor - 48 ;
+  entrar(sem);
+}
